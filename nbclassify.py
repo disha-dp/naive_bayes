@@ -19,18 +19,8 @@ list_result={}
 res_file=open('nboutput.txt','w')
 def ApplyMultinomialNB(C,V,prior,condProb,d):
 	global WordsInClass
-	#os.chdir(d)
-
-	for doc in glob.glob(d + '/**/**/**/*.txt'):#, recursive=True):
-	#for root, dirs, files in os.walk(os.getcwd()):
-	#for doc in files:
-		#print doc
-		#if doc.endswith(('.txt')):
+	for doc in glob.glob(d + '/**/**/**/*.txt'):#, recursive=True
 		try:
-			#print dirs
-			#print root
-			#print doc
-			#print os.getcwd()
 			new_file1=open(os.path.abspath(doc),"r")
 			words=[word for line in new_file1 for word in line.split()]				
 			for c in C:
@@ -42,25 +32,18 @@ def ApplyMultinomialNB(C,V,prior,condProb,d):
 		finally:
 			new_file1.close()
 		ranks=[0,0,0,0]
-		#instead of top 2, use top from pos/neg and top from true/dec
-		for num in heapq.nlargest(2,score):
-			ranks[score.index(num)]=ranks[score.index(num)]+1
-		list_result[doc]= ranks
-
-	for res in list_result:
-		print ('writing labels for file: '+res)
-		if(list_result[res][2]>list_result[res][3] and list_result[res][0]>list_result[res][1]):# true neg
-			res_file.write('truthful negative '+res+"\n")
-		if(list_result[res][3]>list_result[res][2] and list_result[res][0]>list_result[res][1]):# dec neg
-			res_file.write('deceptive negative '+res+"\n")
-		if(list_result[res][2]>list_result[res][3] and list_result[res][1]>list_result[res][0]):# true pos
-			res_file.write('truthful positive '+res+"\n")
-		if(list_result[res][3]>list_result[res][2] and list_result[res][1]>list_result[res][0]):#dec pos
-			res_file.write('deceptive positive '+res+"\n")
-			
-
 		
-	res_file.close()
+		if score[2]>score[3] and score[0]>score[1]:
+			res_file.write('truthful negative '+doc+"\n")
+		else:
+			if score[3]>score[2] and score[0]>score[1]:
+				res_file.write('deceptive negative '+doc+"\n")
+			else:
+				if score[2]>score[3] and score[1]>score[0]:
+					res_file.write('truthful positive '+doc+"\n")		
+				else:
+					res_file.write('deceptive positive '+doc+"\n")
+
 
 	return # return class with max score
 
